@@ -9,6 +9,9 @@
 #include <math.h>
 #include <pthread.h>
 #include <errno.h>
+#include <ifaddrs.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
 
 #define SQRT_REQUEST 0x01
 #define TIME_REQUEST 0x02
@@ -18,7 +21,7 @@
 #define MAX_CLIENT_THREADS 16
 pthread_mutex_t thread_count_mutex = PTHREAD_MUTEX_INITIALIZER;
 int thread_count = 0;
-void parameters_read(long int *SERVER_PORT)
+void parameters_read(long int *SERVER_PORT,char *net_if,size_t size)
 {
     FILE *config_file = fopen("server_config.txt", "r");
     if(config_file == NULL)
@@ -26,13 +29,25 @@ void parameters_read(long int *SERVER_PORT)
         printf("1. Config file not found\n");
         exit(1);
     }
+    SERVER_PORT = 8080;
+    strcpy(net_if, "");
     char line[256];
-    fgets(line, sizeof(line), config_file);
-    char *key = strtok(line, ":");
-    char *value = strtok(NULL, ":");
-    if(strcmp(key, "SERVER_PORT") == 0)
-    {
-        *SERVER_PORT = atol(value);
+    while (fgets(line, sizeof(line), config_file) != NULL) {
+        line[strcspn(line, "\n")] = 0;
+        char *key = strtok(line, ":");
+        if (key == NULL) continue;
+        char *value = strtok(NULL, ":");
+        if (value == NULL) continue;
+        while (*value == ' ') value++;
+        if(strcmp(key, "SERVER_PORT") == 0)
+        {
+            SERVER_PORT = atol(value);
+        }
+        else if(strcmp(key, "NETWORK_INTERFACE") == 0)
+        {
+            strncpy(net_if, value, size - 1);
+            net_if[sizeof(net_if) - 1] = '\0';
+        }
     }
     printf("1. Config file read successfully\n");
     fclose(config_file);
@@ -139,7 +154,8 @@ int main()
     pthread_t client_threads[MAX_CLIENT_THREADS];
     //socket create
     long int PORT;
-    parameters_read(&PORT);    
+    char interface[16];
+    parameters_read(&PORT,&interface,16);    
     //ipv4, tcp, 0 -- default tcp
     if((server_socket = socket(AF_INET, SOCK_STREAM, 0))==-1)
     {
@@ -160,8 +176,27 @@ int main()
     //ipv4
     server_address.sin_family = AF_INET;
     //dowolny adr
-    server_address.sin_addr.s_addr = INADDR_ANY;
     server_address.sin_port = htons(PORT);
+    if(strlen(interface) > 0)
+    {
+        struct ifreq ifr;
+        memset(&ifr, 0, sizeof(ifr));
+        strncpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
+        if (ioctl(server_socket, SIOCGIFADDR, &ifr) == -1) {
+            perror("3. ioctl failed");
+            close(server_socket);
+            return -1;
+        }
+        struct sockaddr_in *addr = (struct sockaddr_in *)&ifr.ifr_addr;
+        server_address.sin_addr = addr->sin_addr;
+        fprintf(stdout,"3. Address is set to %s\n", inet_ntoa(server_address.sin_addr));
+    }
+    else
+    {
+        fprintf(stdout,"3. Address is set to INADDR_ANY\n");
+        server_address.sin_addr.s_addr = INADDR_ANY;
+
+    }
     //bind - przypisanie adresu do socketa
     if(bind(server_socket, (struct sockaddr *)&server_address, sizeof(server_address))==-1)
     {
