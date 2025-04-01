@@ -29,7 +29,7 @@ void parameters_read(long int *SERVER_PORT,char *net_if,size_t size)
         printf("1. Config file not found\n");
         exit(1);
     }
-    SERVER_PORT = 8080;
+    *SERVER_PORT = 8080;
     strcpy(net_if, "");
     char line[256];
     while (fgets(line, sizeof(line), config_file) != NULL) {
@@ -41,12 +41,12 @@ void parameters_read(long int *SERVER_PORT,char *net_if,size_t size)
         while (*value == ' ') value++;
         if(strcmp(key, "SERVER_PORT") == 0)
         {
-            SERVER_PORT = atol(value);
+            *SERVER_PORT = atol(value);
         }
         else if(strcmp(key, "NETWORK_INTERFACE") == 0)
         {
             strncpy(net_if, value, size - 1);
-            net_if[sizeof(net_if) - 1] = '\0';
+            net_if[size - 1] = '\0';
         }
     }
     printf("1. Config file read successfully\n");
