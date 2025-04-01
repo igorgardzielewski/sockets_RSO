@@ -1,0 +1,21 @@
+version: '3'
+services:
+  server:
+    build: .
+    networks:
+      - server_network
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./server_config.txt:/app/server_config.txt
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  server_network:
+    driver: bridge
