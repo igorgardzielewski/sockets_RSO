@@ -29,7 +29,9 @@ void parameters_read(long int *SERVER_PORT,char *net_if,size_t size)
         printf("1. Config file not found\n");
         exit(1);
     }
+    //jakkis zeby byl domyslnie
     *SERVER_PORT = 8080;
+    //domyslnie pusty interfejs
     strcpy(net_if, "");
     char line[256];
     while (fgets(line, sizeof(line), config_file) != NULL) {
@@ -167,7 +169,7 @@ int main()
         fprintf(stdout,"2. Socket created successfully\n");
     }
     int socket_option = 1;
-    //restart serwera zapobiega bleda
+    //restart serwera zapobiega bleda so_reuseaddr zapobiega already in use
     if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR,&socket_option, sizeof(socket_option)) < 0) {
         perror("3. Setsockopt failed\n");
         close(server_socket);
@@ -183,6 +185,7 @@ int main()
         memset(&ifr, 0, sizeof(ifr));
 
         strncpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
+        //pobieranie adresu z interfejsu
         if (ioctl(server_socket, SIOCGIFADDR, &ifr) == -1) {
             fprintf(stdout,"3. ioctl failed for: %s\n",interface);
             fprintf(stdout,"Address is set to INADDR_ANY\n");
