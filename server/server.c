@@ -191,9 +191,11 @@ int main()
             fprintf(stdout,"Address is set to INADDR_ANY\n");
             server_address.sin_addr.s_addr = INADDR_ANY;
         }
+        else{
         struct sockaddr_in *addr = (struct sockaddr_in *)&ifr.ifr_addr;
         server_address.sin_addr = addr->sin_addr;
         fprintf(stdout,"3. Address is set to %s\n", inet_ntoa(server_address.sin_addr));
+        }
     }
     else
     {
