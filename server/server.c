@@ -185,9 +185,8 @@ int main()
         strncpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
         if (ioctl(server_socket, SIOCGIFADDR, &ifr) == -1) {
             fprintf(stdout,"3. ioctl failed for: %s\n",interface);
-            fprintf(stdout,"3. Address is set to INADDR_ANY\n");
+            fprintf(stdout,"Address is set to INADDR_ANY\n");
             server_address.sin_addr.s_addr = INADDR_ANY;
-            return -1;
         }
         struct sockaddr_in *addr = (struct sockaddr_in *)&ifr.ifr_addr;
         server_address.sin_addr = addr->sin_addr;
