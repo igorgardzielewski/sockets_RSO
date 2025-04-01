@@ -177,15 +177,16 @@ int main()
     server_address.sin_family = AF_INET;
     //dowolny adr
     server_address.sin_port = htons(PORT);
-    if(strlen(interface) > 0 && strcmp(interface,"")!=0)
+    if(strlen(interface) > 0)
     {
         struct ifreq ifr;
         memset(&ifr, 0, sizeof(ifr));
 
-       strncpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
+        strncpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
         if (ioctl(server_socket, SIOCGIFADDR, &ifr) == -1) {
-            perror("3. ioctl failed");
-            close(server_socket);
+            fprintf(stdout,"3. ioctl failed for: %s\n",interface);
+            fprintf(stdout,"3. Address is set to INADDR_ANY\n");
+            server_address.sin_addr.s_addr = INADDR_ANY;
             return -1;
         }
         struct sockaddr_in *addr = (struct sockaddr_in *)&ifr.ifr_addr;
