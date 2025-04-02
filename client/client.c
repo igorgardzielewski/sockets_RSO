@@ -196,12 +196,51 @@ int main()
         return -1;
     }
     //requst
-    sqrt_req(&conn,1, 16.0);
-    response(&conn);
-    time_req(&conn, 2);
-    response(&conn);
-    sqrt_req(&conn, 3, 25.0);
-    response(&conn);
-    close(conn.socket);
+    double num;
+    int choice;
+    while(1)
+    {
+        printf("Choose option:\n");
+        printf("1. Sqrt request\n");
+        printf("2. Time request\n");
+        printf("0. Exit\n");
+        if(1!=scanf("%d", &choice))
+        {
+            printf("5. Invalid input\n");
+            while(getchar() != '\n');
+            continue;
+        }
+        switch(choice)
+        {
+            case 1:
+                printf("Enter number: ");
+                if(1!=scanf("%lf", &num))
+                {
+                    printf("5. Invalid input\n");
+                    while(getchar() != '\n');
+                    continue;
+                }
+                sqrt_req(&conn, 1, num);
+                response(&conn);
+                break;
+            case 2:
+                time_req(&conn, 2);
+                response(&conn);
+                break;
+            case 0:
+                close(conn.socket);
+                return 0;
+            default:
+                printf("Invalid choice\n");
+                continue;
+        }
+    }
+    // sqrt_req(&conn,1, 16.0);
+    // response(&conn);
+    // time_req(&conn, 2);
+    // response(&conn);
+    // sqrt_req(&conn, 3, 25.0);
+    // response(&conn);
+    // close(conn.socket);
     return 0;
 }
