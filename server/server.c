@@ -137,6 +137,7 @@ void *client_thread(void *arg)
             }
         }
     }
+    fprintf(stdout,"Client disconnected\n");
     close(client_socket);
     free(client);
     pthread_mutex_lock(&thread_count_mutex);

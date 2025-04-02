@@ -169,8 +169,8 @@ int set_up_connection(ConnectionInfo *conn)
         //htons do big endian
 
     server_address.sin_port = htons(conn->server_port);
-        //konwertuje adres z postaci string na binarna
-
+        
+    //konwertuje adres z postaci string na binarna
     if(inet_pton(AF_INET, conn->server_ip, &server_address.sin_addr)<=0)
     {
         printf("3. Invalid address\n");
