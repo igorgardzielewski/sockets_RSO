@@ -170,12 +170,6 @@ int main()
         fprintf(stdout,"2. Socket created successfully\n");
     }
     int socket_option = 1;
-    //restart serwera zapobiega bleda so_reuseaddr zapobiega already in use
-    if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR,&socket_option, sizeof(socket_option)) < 0) {
-        perror("3. Setsockopt failed\n");
-        close(server_socket);
-        return -1;
-    }
     //ipv4
     server_address.sin_family = AF_INET;
     //dowolny adr
