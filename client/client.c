@@ -214,7 +214,7 @@ int main()
         {
             case 1:
                 printf("Enter number: ");
-                if(1!=scanf("%lf", &num))
+                if(1!=scanf("%lf.2", &num))
                 {
                     printf("5. Invalid input\n");
                     while(getchar() != '\n');
